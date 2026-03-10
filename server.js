@@ -11,7 +11,7 @@ const db = mysql.createConnection({
     host: simpelin-mysql-2e111895-arngoding.l.aivencloud.com,
     port: 15255, // GANTI DENGAN PORT AIVEN ANDA
     user: avnadmin, // GANTI JIKA BERBEDA
-    password: 'RAHASIA',
+    password: process.env.DB_PASSWORD || 'RAHASIA',
     database: defaultdb,
     ssl: { rejectUnauthorized: false }, // Wajib ada untuk Aiven
     allowPublicKeyRetrieval: true       // SOLUSI ERROR PUBLIC KEY
@@ -43,3 +43,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Server Backend berjalan di port ${PORT}`);
 });
+module.exports = app;
