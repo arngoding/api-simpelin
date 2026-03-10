@@ -8,9 +8,9 @@ app.use(express.json());
 
 // Konfigurasi Koneksi ke Aiven MySQL
 const db = mysql.createConnection({
-    host: 'MASUKKAN_HOST_AIVEN_DISINI', // Contoh: mysql-xxx.aivencloud.com
-    port: 25060,                        // Ganti dengan port Aiven Anda
-    user: 'avnadmin',
+    host: simpelin-mysql-2e111895-arngoding.l.aivencloud.com, // Contoh: mysql-xxx.aivencloud.com
+    port: 15255,                        // Ganti dengan port Aiven Anda
+    user: avnadmin,
     password: process.env.DB_PASSWORD || 'RAHASIA',
     database: 'defaultdb',
     ssl: { rejectUnauthorized: false },
