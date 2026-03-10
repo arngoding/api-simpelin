@@ -35,6 +35,40 @@ app.get('/', (req, res) => {
     res.send('Backend API SiMPelIn Aktif dan Berjalan!');
 });
 
+// --- URL RAHASIA UNTUK MEMBUAT TABEL (HANYA DIPAKAI SEKALI) ---
+app.get('/api/setup-database', (req, res) => {
+    // 1. Perintah SQL untuk membuat tabel
+    const createTableQuery = `
+        CREATE TABLE IF NOT EXISTS items (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            sku VARCHAR(50) NOT NULL UNIQUE,
+            stock INT DEFAULT 0,
+            category VARCHAR(100),
+            unit VARCHAR(50)
+        )
+    `;
+
+    // 2. Perintah SQL untuk memasukkan 2 data awal
+    const insertDataQuery = `
+        INSERT IGNORE INTO items (name, sku, stock, category, unit) VALUES
+        ('Kertas HVS A4 80gr', 'ATK-001', 150, 'Alat Tulis', 'Rim'),
+        ('Tinta Printer Epson Hitam', 'PRN-012', 25, 'Komputer', 'Botol')
+    `;
+
+    // Eksekusi perintah pertama (Buat Tabel)
+    db.query(createTableQuery, (err) => {
+        if (err) return res.status(500).send("Gagal membuat tabel: " + err.message);
+        
+        // Jika sukses, eksekusi perintah kedua (Isi Data)
+        db.query(insertDataQuery, (err2) => {
+            if (err2) return res.status(500).send("Gagal mengisi data: " + err2.message);
+            
+            res.send("🎉 BERHASIL! Tabel 'items' sudah dibuat dan diisi data. Silakan tutup halaman ini.");
+        });
+    });
+});
+// -------------------------------------------------------------
 // --- API ROUTES ---
 
 app.get('/api/items', (req, res) => {
