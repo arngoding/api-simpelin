@@ -37,8 +37,8 @@ app.get('/', (req, res) => {
 
 // --- URL RAHASIA UNTUK MEMBUAT TABEL (HANYA DIPAKAI SEKALI) ---
 app.get('/api/setup-database', (req, res) => {
-    // 1. Perintah SQL untuk membuat tabel
-    const createTableQuery = `
+    // 1. Perintah SQL untuk membuat tabel Items (Barang)
+    const createItemsTable = `
         CREATE TABLE IF NOT EXISTS items (
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
@@ -49,22 +49,46 @@ app.get('/api/setup-database', (req, res) => {
         )
     `;
 
-    // 2. Perintah SQL untuk memasukkan 2 data awal
-    const insertDataQuery = `
+    // 2. Perintah SQL untuk membuat tabel Users (Pengguna)
+    const createUsersTable = `
+        CREATE TABLE IF NOT EXISTS users (
+            id VARCHAR(50) PRIMARY KEY,
+            pass VARCHAR(255) NOT NULL,
+            name VARCHAR(255) NOT NULL,
+            role VARCHAR(50) DEFAULT 'user',
+            bidang VARCHAR(100)
+        )
+    `;
+
+    // 3. Perintah SQL untuk memasukkan data awal
+    const insertItems = `
         INSERT IGNORE INTO items (name, sku, stock, category, unit) VALUES
         ('Kertas HVS A4 80gr', 'ATK-001', 150, 'Alat Tulis', 'Rim'),
         ('Tinta Printer Epson Hitam', 'PRN-012', 25, 'Komputer', 'Botol')
     `;
 
-    // Eksekusi perintah pertama (Buat Tabel)
-    db.query(createTableQuery, (err) => {
-        if (err) return res.status(500).send("Gagal membuat tabel: " + err.message);
+    const insertUsers = `
+        INSERT IGNORE INTO users (id, pass, name, role, bidang) VALUES
+        ('admin', 'admin123', 'admin', 'admin', 'UMUM'),
+        ('userumum', 'adminumum', 'UMUM', 'user', 'UMUM')
+    `;
+
+    // Eksekusi perintah secara berurutan (Berantai)
+    db.query(createItemsTable, (err) => {
+        if (err) return res.status(500).send("Gagal membuat tabel items: " + err.message);
         
-        // Jika sukses, eksekusi perintah kedua (Isi Data)
-        db.query(insertDataQuery, (err2) => {
-            if (err2) return res.status(500).send("Gagal mengisi data: " + err2.message);
+        db.query(createUsersTable, (err2) => {
+            if (err2) return res.status(500).send("Gagal membuat tabel users: " + err2.message);
             
-            res.send("🎉 BERHASIL! Tabel 'items' sudah dibuat dan diisi data. Silakan tutup halaman ini.");
+            db.query(insertItems, (err3) => {
+                if (err3) return res.status(500).send("Gagal mengisi data items: " + err3.message);
+                
+                db.query(insertUsers, (err4) => {
+                    if (err4) return res.status(500).send("Gagal mengisi data users: " + err4.message);
+                    
+                    res.send("🎉 BERHASIL! Semua tabel (items & users) sudah dibuat dan diisi data. Silakan tutup halaman ini.");
+                });
+            });
         });
     });
 });
